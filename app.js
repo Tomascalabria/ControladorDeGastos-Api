@@ -3,8 +3,8 @@ const app=express()
 require('dotenv').config();
 const {promises:fs, write}=require('fs')
 const body_parser =require('body-parser')
-const users=require('./routes/users')
-const expenses=require('./routes/Expenses')
+const users=require('./Src/routes/users')
+const expenses=require('./Src/routes/Expenses')
 
 const mongoose =require('mongoose')
 const cors = require('cors')
