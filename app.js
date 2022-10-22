@@ -5,7 +5,6 @@ const {promises:fs, write}=require('fs')
 const body_parser =require('body-parser')
 const users=require('./Src/routes/users')
 const expenses=require('./Src/routes/Expenses')
-
 const mongoose =require('mongoose')
 const cors = require('cors')
 
@@ -17,7 +16,7 @@ app.use(cors({origin:true}))
 mongoose.connect((`${process.env.MONGO_URI}`))
 .then((data)=>{
     console.log('Connection to DB was succesfull!')})
-.catch((err)=>{console.log(err)})
+.catch((err)=>{console.log(err+'/n'+ process.env.MONGO_URI)})
 
 
 app.get('/',(req,res)=>{
