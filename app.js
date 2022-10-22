@@ -28,7 +28,7 @@ app.use('/expenses',expenses)
 
 
 
-const port = 8080 || process.env.port
+const port = 8080 || process.env.PORT
 app.listen(port,()=>{
 console.log('Api is on')
 })
