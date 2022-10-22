@@ -16,7 +16,7 @@ app.use(cors({origin:true}))
 mongoose.connect(`${process.env.MONGO_URI}`)
 .then((data)=>{
     console.log('Connection to DB was succesfull!')})
-.catch((err)=>{console.log(err+'/n'+ process.env.MONGO_URI)})
+.catch((err)=>{console.log(err)})
 
 
 app.get('/',(req,res)=>{
