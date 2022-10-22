@@ -29,6 +29,8 @@ app.use('/expenses',expenses)
 
 
 const port = process.env.PORT || 5050
-app.listen(port,()=>{
+const host = '0.0.0.0'
+
+app.listen(port,host,()=>{
 console.log('Api is on')
 })
