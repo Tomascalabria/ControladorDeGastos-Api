@@ -37,7 +37,7 @@ router.post('/register',async (req,res)=>{
   }})
 
   //Login
-router.post('/login',verifyToken,async(req,res)=>{
+router.post('/login',async(req,res)=>{
   try{
       const user=await User.findOne({username:req.body.username})
       const accesToken=jwt.sign({
