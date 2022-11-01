@@ -6,7 +6,7 @@ const User = require('../Models/User');
 const {verifyToken,verifyAuthorization}=require('../Middlewares/verifyToken')
 /* GET users listing. */
 
-router.get('/:id',verifyAuthorization,async (req, res)=> {
+router.get('/:id',verifyAuthorization,verifyToken,async (req, res)=> {
 const user = await User.findById(req.params.id)
 const {password,...userPublicInfo}=user._doc
 res.status(200)
@@ -28,6 +28,7 @@ router.put('/:id',verifyAuthorization,async(req,res)=>{
 res.status(200).json(`User updated Succesfull ${updatedUser}`)
   
 }
+
 
   catch(err){
     res.send(403).json('There has been an error ')

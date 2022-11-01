@@ -7,7 +7,7 @@ const verifyToken=async(req,res,next)=>{
     const token=authHeader.split(" ")[1]
         jwt.verify(token,process.env.JWT_SECRET,(err,user)=>{
             if(err){
-             res.send(403).json('sorry there has been an error')
+             res.status(403).json('sorry your token has expire. Please enter again')
             
             }
             else{
