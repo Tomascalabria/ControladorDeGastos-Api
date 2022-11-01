@@ -32,7 +32,7 @@ try{
     // req.headers.username
     const user = await User.findById(req.headers.id)
     console.log(user.friends)
-    res.status(200).json(user.friends)
+    res.status(200).jsonc(user.friends)
 
 }
 

@@ -27,7 +27,7 @@ app.use('/friends',friends)
 
 
 
-const port =  5050
+const port =  process.env.PORT||5050
 const host = '0.0.0.0'
 
 app.listen(port,host,()=>{
