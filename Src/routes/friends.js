@@ -15,35 +15,27 @@ router.get('/:id/all',verifyAuthorization,async(req,res)=>{
     }
 })
 
-router.post('/add',(verifyToken),async(req,res)=>{
-    // try{
-    // const user = await User.findById(req.params.id)
-    //     if (user){
-
-    //         const friend=await User.findById(req.body.friend)
-    //         const {isAdmin,password,friends,...friendsInfo}=friend._doc
-    //         const newFriend= user.friends.push(friendsInfo)
-    //         res.status(200).json(`Friend Added corectly ${newFriend}` )
-    //     }
-    //     else{
-    //         res.status(404).json('sorry please review the given name and try again')
-    //     }
-try{
-    // req.headers.username
-    const user = await User.findById(req.headers.id)
-    console.log(user.friends)
-    res.status(200).jsonc(user.friends)
+router.post('/add',async(req,res)=>{
+  try{ 
+    const user = await User.findOne({},{id:req.body.id})
+if(user){
+      const friend= await User.findOne({},{username:req.body.friend})
+      res.status(200).json(`Friend Added corectly ${friend}` )
+}
+else{
+  res.status(401).json('Please review the username you entered')
 
 }
+  
+  }
+  catch(err){
+    res.status(401).json('Sorry there has been an internal server error')
+  }
 
-catch(err){
-res.send(404).json('hubo un error')
-}
 
 
 
 })
-
 
 
 
