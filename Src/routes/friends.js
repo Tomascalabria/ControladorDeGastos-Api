@@ -2,7 +2,6 @@ var  express = require('express');
 var  router = express.Router();
 const User = require('../Models/User');
 const {verifyToken,verifyAuthorization}=require('../Middlewares/verifyToken');
-const { $where } = require('../Models/User');
 
 
 router.get('/:id/all',verifyAuthorization,async(req,res)=>{
@@ -18,57 +17,65 @@ router.get('/:id/all',verifyAuthorization,async(req,res)=>{
 
 router.post('/add',async(req,res)=>{
   const friend= await User.findOne({username:req.body.friend})
-  if(friend){
-    try{ 
-      const user=await User.findById(req.body.id)
-      user.friends.find((x)=>{
-        if(x.friend_username==req.body.friend){
+
+
+  const user=await User.findById(req.body.id)
+  if(friend&&friend!=req.headers.username){
+   
+    user.friends.find((x)=>{
+    
+      switch(friend.username){
+        case user.username:{
+          res.status(401).json({
+            status: "Failed",
+            message: "We are sorry but you cant add yourself as friend",
+            data:null
+        
+        })
+        }
+        case x.friend_username:{
           res.status(401).json({
             status: "Error",
             message: `Sorry, your friend has been already added`,
             data: []
-                      
           })
         }
-          else{
-            User.findByIdAndUpdate(req.body.id,{
+        default:{
+
+          User.findByIdAndUpdate(req.body.id,{
+          
+            $addToSet:{friends:{
+              friend_id:friend.id,
+              friend_username:friend.username
+            }}
+              },{upsert:true,safe:true})
+                .then(result=>{
+                  res.status(200).json({
+                    status: "Success",
+                    message: `Friend has been added correctly! `,
+                    data: result
+                      })
+                })
+                
+              .catch((err)=>{
+                res.status(500).json({
+                  status: "Failed",
+                  message: "Database Error",
+                  data: err
+                 })
+                })
+            }
+             }  }
+             )}
+            
+
+     
+
         
-              $addToSet:{friends:{
-                friend_id:friend.id,
-                friend_username:friend.username
-              }}
-            },{upsert:true,safe:true})
-        
-            .then((result)=>{
-              res.status(200).json({
-                      status: "Success",
-                      message: `Friend has been added correctly! ${result}`,
-                      data: result
-                      
-              })
-            console.log(result)
-      
-            })
-          }
-        })
-    
-      .catch((err)=>{
-         res.status(500).json({
-          status: "Failed",
-          message: "Database Error",
-          data: err
-         })
-        })
-      }
+     
+  
 
-
-  catch(err){
-    res.status(401).json('Sorry there has been an internal server error')
-  }
-}
-else{
-
-
+   else{
   res.status(404).json({
       status: "Failed",
       message: "We are sorry but the username was not found",
@@ -77,8 +84,6 @@ else{
   console.log(`There has been an failed attempt of adding a new user. \nUser: ${req.headers.username} `)
 
 }
-
-
   
 })
 
