@@ -4,8 +4,9 @@ const jwt=require('jsonwebtoken')
 const verifyToken=async(req,res,next)=>{
     const authHeader=req.headers.token
     if(authHeader){
-    const token=authHeader.split(" ")[1]
-        jwt.verify(token,process.env.JWT_SECRET,(err,user)=>{
+    const token=authHeader
+    jwt.verify(token,process.env.JWT_SECRET,(err,user)=>{
+            console.log(user)
             if(err){
              res.status(403).json('sorry your token has expire. Please enter again')
             
@@ -14,7 +15,7 @@ const verifyToken=async(req,res,next)=>{
                 req.user=user    
                 next()
             }
-        })
+        })  
     }
     else{
         return res.status(401).json('You must authenticate')

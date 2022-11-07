@@ -14,23 +14,41 @@ router.get('/',async(req, res)=> {
        });
  }
 catch(err){
-    res.status(500).json('We are sorry there was an internal server error')
+    throw {
+        status: 401,
+        json: {
+          status: "Error",
+          message: `Sorry,there has been an internal server error`,
+          data:null
+        }
+      }   
 }
 }
 )
 
 router.delete('/delete/:_id',async(req,res)=>{
+    // I should lookup the user in DB in order to validate it against the expense.
+
     try{
         const expense= await Expense.findById(req.params._id)
     if(req.headers.username==expense.creator||req.headers.admin==true){
-            await expense.delete() 
+          const deletedItem=  await expense.delete() 
       
-res.status(201).json(`Item deleted succesfully ${deletedItem.title}`)
+        res.status(200).json({
+            status: "Success",
+            message: `Expense has deleted correctly! `,
+            data: expense.title
+        })
     }
-    else{
-        res.status(401).json('Sorry but you are not able to perform this action')
-    }
-    }
+  
+    throw {
+        status: 401,
+        json: {
+          status: "Error",
+          message: `You are not able to perform this task.`,
+          data:null
+        }
+    }}
     catch(err){
         res.send(err)
     }
@@ -48,13 +66,24 @@ router.post('/create',async(req,res)=>{
     })  
 
     try{
-        
         let savedExpense= await newExpense.save()
-        res.status(201).json('Gasto Creado! \n'  + savedExpense)
-        console.log(savedExpense)
+        res.status(200).json({
+            status: "Success",
+            message: `Expense has been added correctly! `,
+            data: savedExpense
+          });
+       
     }
     catch(err){
-        res.status(402).json('There has been an error')
+        throw {
+            status: 401,
+            json: {
+              status: "Error",
+              message: `Sorry,there has been an internal server error`,
+              data:null
+            }
+          }
+        
     }
 })
 

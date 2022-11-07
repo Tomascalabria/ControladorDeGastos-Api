@@ -2,12 +2,20 @@ var  express = require('express');
 var  router = express.Router();
 const User = require('../Models/User');
 const {verifyToken,verifyAuthorization}=require('../Middlewares/verifyToken');
+const {userExists} =require('../Utils/utils.js')
 
-
-router.get('/:id/all',verifyAuthorization,async(req,res)=>{
+router.post('/:id/search',verifyAuthorization,async(req,res)=>{
     try{
-   const user = await User.findById(req.params.id)
-   res.send(user.friends)
+   const users = await User.find({username:req.body.search},{profile_image:true,email:true,isAdmin:true ,username:true,_id:true},{limit:10,sort:{username:-1}})
+      
+   console.log(`-----------------------Cut-----------------------------------
+                    ${users}`)
+                    
+    res.status(200).json({
+      status: "Success",
+      message: `Friends found! `,
+      data: users
+    });
     }
     catch(err){
         res.status(500).json('We are sorry there was an internal server error')
@@ -16,78 +24,62 @@ router.get('/:id/all',verifyAuthorization,async(req,res)=>{
 })
 
 router.post('/add',async(req,res)=>{
-  const friend= await User.findOne({username:req.body.friend})
 
+  try { 
+    const friend = await User.findOne({ username:req.body.friend });
+    const user = await User.findById(req.body.id);
 
-  const user=await User.findById(req.body.id)
-  if(friend&&friend!=req.headers.username){
-   
-    user.friends.find((x)=>{
-    
-      switch(friend.username){
-        case user.username:{
-          res.status(401).json({
-            status: "Failed",
-            message: "We are sorry but you cant add yourself as friend",
-            data:null
-        
-        })
+    if (!user || !friend) {
+      throw {
+        status: 404,
+        json: {
+          status: "Failed",
+          message: "user id or friend name not found",
+          data: null
+        } 
+      }
+    }
+
+    if (friend.username === user.username) {
+      throw {
+        status: 401,
+        json: {
+          status: "Failed",
+          message: "We are sorry but you cant add yourself as friend",
+          data:null
         }
-        case x.friend_username:{
-          res.status(401).json({
-            status: "Error",
-            message: `Sorry, your friend has been already added`,
-            data: []
-          })
+      }
+    }
+
+
+    if (userExists(user.friends,friend.username)) {
+      throw {
+        status: 401,
+        json: {
+          status: "Error",
+          message: `Sorry, your friend has been already added`,
+          data:null
         }
-        default:{
+      }
+    }
 
-          User.findByIdAndUpdate(req.body.id,{
-          
-            $addToSet:{friends:{
-              friend_id:friend.id,
-              friend_username:friend.username
-            }}
-              },{upsert:true,safe:true})
-                .then(result=>{
-                  res.status(200).json({
-                    status: "Success",
-                    message: `Friend has been added correctly! `,
-                    data: result
-                      })
-                })
-                
-              .catch((err)=>{
-                res.status(500).json({
-                  status: "Failed",
-                  message: "Database Error",
-                  data: err
-                 })
-                })
-            }
-             }  }
-             )}
-            
+    const addToSet = {
+      $addToSet:{friends:{
+        friend_id:friend.id,
+        friend_username:friend.username
+      }}
+    };
 
-     
+    const result = await User.findByIdAndUpdate(req.body.id, addToSet,{ upsert:true, safe:true });
+    res.status(200).json({
+      status: "Success",
+      message: `Friend has been added correctly! `,
+      data: result
+    });
 
-        
-     
-  
-
-   else{
-  res.status(404).json({
-      status: "Failed",
-      message: "We are sorry but the username was not found",
-      data:null
-  })
-  console.log(`There has been an failed attempt of adding a new user. \nUser: ${req.headers.username} `)
-
-}
-  
+  } catch (error) {
+    console.log(error);
+    res.status(error.status).json(error.json);
+  }
 })
-
-
-
-
 module.exports = router;
