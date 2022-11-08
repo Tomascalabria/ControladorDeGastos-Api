@@ -7,15 +7,16 @@ const {userExists} =require('../Utils/utils.js')
 router.post('/:id/search',verifyAuthorization,async(req,res)=>{
     try{
    const users = await User.find({username:req.body.search},{profile_image:true,email:true,isAdmin:true ,username:true,_id:true},{limit:10,sort:{username:-1}})
-      
    console.log(`-----------------------Cut-----------------------------------
-                    ${users}`)
-                    
+   ${users}`)
+   
+   
     res.status(200).json({
       status: "Success",
       message: `Friends found! `,
       data: users
-    });
+    })
+
     }
     catch(err){
         res.status(500).json('We are sorry there was an internal server error')
