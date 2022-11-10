@@ -5,6 +5,7 @@ const {verifyToken,verifyAuthorization}=require('../Middlewares/verifyToken');
 const {userExists} =require('../Utils/utils.js')
 
 router.post('/:id/search',verifyAuthorization,async(req,res)=>{
+  console.log(req.params.id)
     try{
    const users = await User.find({username:req.body.search},{profile_image:true,email:true,isAdmin:true ,username:true,_id:true},{limit:10,sort:{username:-1}})
    console.log(`-----------------------Cut-----------------------------------
@@ -27,11 +28,11 @@ router.post('/:id/search',verifyAuthorization,async(req,res)=>{
 router.post('/add',async(req,res)=>{
 
   try { 
-    const friend = await User.findOne({ username:req.body.friend });
+    const friend = await User.findById(req.body.friend);
     const user = await User.findById(req.body.id);
 
     if (!user || !friend) {
-      throw {
+      throw { 
         status: 404,
         json: {
           status: "Failed",
