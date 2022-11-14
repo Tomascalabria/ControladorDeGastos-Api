@@ -61,7 +61,8 @@ router.post('/create',async(req,res)=>{
         type:req.body.type,
         category:req.body.category,
         amount:req.body.amount,
-        creator:req.body.creator
+        creator:req.body.creator,
+        participants:req.body.participants
         
     })  
 
@@ -71,6 +72,9 @@ router.post('/create',async(req,res)=>{
             status: "Success",
             message: `Expense has been added correctly! `,
             data: savedExpense
+          });
+          req.body.participants.forEach(element => {
+            console.log(element)
           });
        
     }
