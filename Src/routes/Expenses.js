@@ -72,9 +72,7 @@ router.post('/create',async(req,res)=>{
             message: `Expense has been added correctly! `,
             data: savedExpense
           });
-          req.body.participants.forEach(element => {
-            console.log(element)
-          });
+
        
     }
     catch(err){
