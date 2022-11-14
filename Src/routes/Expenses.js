@@ -64,29 +64,19 @@ router.post('/create',async(req,res)=>{
         participants:req.body.participants
         
     })  
+if(newExpense){
 
     try{
         let savedExpense= await newExpense.save()
-      .then(()=>{
-
-          res.status(200).json({
+        res.status(200).json({
               status: "Success",
               message: `Expense has been added correctly! `,
               data: savedExpense
             });
             
-        })
-        .catch(()=>{
-            throw{
-                status: 500,
-                json: {
-                  status: "Error",
-                  message: `Sorry, there has been a database error`,
-                  data:null
-                }
-            }
-        })
-    }
+      
+        
+        }
     catch(err){
         throw {
             status: 401,
@@ -96,7 +86,17 @@ router.post('/create',async(req,res)=>{
               data:null
             }
           }
-        
+    }
+    throw{
+           
+            status: 500,
+            json: {
+              status: "Error",
+              message: `Sorry, there has been a database error`,
+              data:null
+            }
+          
+    }
     }
 })
 
