@@ -67,13 +67,25 @@ router.post('/create',async(req,res)=>{
 
     try{
         let savedExpense= await newExpense.save()
-        res.status(200).json({
-            status: "Success",
-            message: `Expense has been added correctly! `,
-            data: savedExpense
-          });
+      .then(()=>{
 
-       
+          res.status(200).json({
+              status: "Success",
+              message: `Expense has been added correctly! `,
+              data: savedExpense
+            });
+            
+        })
+        .catch(()=>{
+            throw{
+                status: 500,
+                json: {
+                  status: "Error",
+                  message: `Sorry, there has been a database error`,
+                  data:null
+                }
+            }
+        })
     }
     catch(err){
         throw {
