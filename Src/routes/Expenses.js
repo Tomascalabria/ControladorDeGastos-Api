@@ -64,19 +64,27 @@ router.post('/create',async(req,res)=>{
         participants:req.body.participants
         
     })  
-if(newExpense){
-
+    
     try{
-        let savedExpense= await newExpense.save()
-        res.status(200).json({
-              status: "Success",
-              message: `Expense has been added correctly! `,
-              data: savedExpense
-            });
+        let savedExpense= await newExpense.save((err,response)=>{
+            if(err){
+                console.log(err)
+            }
             
+            res.status(200).json({
+                status: "Success",
+                message: `Expense has been added correctly! `,
+                data: savedExpense
+            });
+            req.body.participants.map((item)=>{
+                console.log('Friend: '+ item)
+            })
+            console.log('Friend: '+ req.body.creator)
+            console.log((req.body.amount/(req.body.participants.length+[req.body.creator].length)))
+        })
       
         
-        }
+    }
     catch(err){
         throw {
             status: 401,
@@ -86,17 +94,7 @@ if(newExpense){
               data:null
             }
           }
-    }
-    throw{
-           
-            status: 500,
-            json: {
-              status: "Error",
-              message: `Sorry, there has been a database error`,
-              data:null
-            }
-          
-    }
+        
     }
 })
 
