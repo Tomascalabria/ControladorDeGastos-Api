@@ -19,7 +19,9 @@ router.get('/',async(req, res)=> {
           }
         ]}, (err, documents)=> {
          res.send(documents);
+         
        });
+       
  }
 catch(err){
     throw {
@@ -34,37 +36,47 @@ catch(err){
 }
 )
 
-router.delete('/delete/:_id',async(req,res)=>{
+router.delete('/delete/:id',async(req,res)=>{
     // I should lookup the user in DB in order to validate it against the expense.
 
     try{
-        const expense= await Expense.findById(req.params._id)
+        const expense= await Expense.findById(req.params.id)
     if(req.headers.username==expense.creator||req.headers.admin==true){
-          const deletedItem=  await expense.delete() 
-      
-        res.status(200).json({
-            status: "Success",
-            message: `Expense has deleted correctly! `,
-            data: expense.title
-        })
+          const deletedItem=  await expense.delete((error,response)=>{
+            if (error){
+                throw {
+                    status: 401,
+                    json: {
+                      status: "Error",
+                      message: `You are not able to perform this task.`,
+                      data:null
+                    }
+                }}
+                else{
+                    res.status(200).json({
+                        status: "Success",
+                        message: `Expense has deleted correctly! `,
+                        data: expense.title
+                    })
+                }
+            }
+
+
+          )}
     }
-  
-    throw {
-        status: 401,
-        json: {
-          status: "Error",
-          message: `You are not able to perform this task.`,
-          data:null
-        }
-    }}
+ 
+        
+      
+    
     catch(err){
         res.send(err)
     }
-})
+}
+)
 
 
 router.post('/create',async(req,res)=>{
-    const expenseAmount=(req.body.amount/req.body.participants.length+[req.body.creator].length)
+    const expenseAmount=(req.body.amount/(req.body.participants.length+[req.body.creator].length))
 
  
     const newExpense=new Expense({
