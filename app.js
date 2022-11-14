@@ -9,10 +9,10 @@ const friends=require('./Src/routes/friends')
 const mongoose =require('mongoose')
 const cors = require('cors')
 
+app.use(cors({origin:true}))
 
 app.use(body_parser.urlencoded({ extended: false }));
 app.use(body_parser.json());
-app.use(cors({origin:true}))
 
 mongoose.connect(`${process.env.MONGO_URI}`)
 .then((data)=>{

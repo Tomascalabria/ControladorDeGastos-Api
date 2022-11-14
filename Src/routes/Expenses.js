@@ -1,14 +1,23 @@
 var express = require('express');
 const Expense = require('../Models/Expense');
-
+const User=require('../Models/User')
 var router = express.Router();
+
 
 /* GET All products. */
 router.get('/',async(req, res)=> {
  try{
 
      const user=req.headers.username
-     const colection= Expense.find({creator:user}, function(err, documents) {
+     const colection= Expense.find({
+        $or: [
+          {
+            creator:user
+          },
+          {
+            participants:user
+          }
+        ]}, (err, documents)=> {
          res.send(documents);
        });
  }
@@ -55,17 +64,21 @@ router.delete('/delete/:_id',async(req,res)=>{
 
 
 router.post('/create',async(req,res)=>{
+    const expenseAmount=(req.body.amount/req.body.participants.length+[req.body.creator].length)
+
+ 
     const newExpense=new Expense({
         title:req.body.title,
         type:req.body.type,
         category:req.body.category,
-        amount:req.body.amount,
+        amount: expenseAmount,
         creator:req.body.creator,
         participants:req.body.participants
         
     })  
     
     try{
+        
         let savedExpense= await newExpense.save((err,response)=>{
             if(err){
                 console.log(err)
@@ -84,7 +97,8 @@ router.post('/create',async(req,res)=>{
         })
       
         
-    }
+    
+}
     catch(err){
         throw {
             status: 401,
