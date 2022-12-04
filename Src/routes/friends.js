@@ -4,21 +4,25 @@ const User = require('../Models/User');
 const {verifyToken,verifyAuthorization}=require('../Middlewares/verifyToken');
 const {userExists} =require('../Utils/utils.js')
 
-router.post('/:id/search',verifyAuthorization,async(req,res)=>{
+router.get('/:id/search',verifyAuthorization,async(req,res)=>{
   console.log(req.params.id)
     try{
-   const users = await User.find({username:req.body.search},{profile_image:true,email:true,isAdmin:true ,username:true,_id:true},{limit:10,sort:{username:-1}})
-   console.log(`-----------------------Cut-----------------------------------
-   ${users}`)
+      const users = await User.find({id:req.params.id},{friends:true},{sort:{username:-1}})
+      console.log(`Success! Friends where found \n ${users}`)
    
-   
+   if (users.length === 0) {
+    res.status(404).json({
+      status: "Error",
+      message: "No users found with the given username"
+    });
+  } else {
     res.status(200).json({
       status: "Success",
       message: `Friends found! `,
       data: users
-    })
-
-    }
+    });
+  }
+}
     catch(err){
         res.status(500).json('We are sorry there was an internal server error')
 
@@ -81,7 +85,11 @@ router.post('/add',async(req,res)=>{
 
   } catch (error) {
     console.log(error);
-    res.status(error.status).json(error.json);
+    res.status(500).json({
+      status: "Error",
+      message: `Unexpected error has occured! `,
+      data: null
+    });
   }
 })
 module.exports = router;

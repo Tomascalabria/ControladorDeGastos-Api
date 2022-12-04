@@ -76,7 +76,7 @@ router.delete('/delete/:id',async(req,res)=>{
 
 
 router.post('/create',async(req,res)=>{
-    const expenseAmount=(req.body.amount/(req.body.participants.length+[req.body.creator].length))
+    const expenseAmount=(req.body.amount/(req.body.participants.length+[req.body.creator].length)).toFixed()
 
  
     const newExpense=new Expense({
@@ -97,7 +97,7 @@ router.post('/create',async(req,res)=>{
             }
             
             res.status(200).json({
-                status: "Success",
+                status: 200,
                 message: `Expense has been added correctly! `,
                 data: savedExpense
             });
